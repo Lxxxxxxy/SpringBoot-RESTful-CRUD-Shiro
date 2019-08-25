@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${status}">错误页面</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <script th:src="@{/js/bootstrap.js}"></script>
+</head>
+<body>
+<h1 th:text="'错误代码：'+${status}"></h1>
+<h1 th:text="'错误信息：'+${error}"></h1>
+<h1 th:text="'发生错误时间：'+${#dates.format(timestamp)}"></h1>
+<a th:href="@{/}" class="btn btn-success">返回首页</a>
+</body>
+</html>

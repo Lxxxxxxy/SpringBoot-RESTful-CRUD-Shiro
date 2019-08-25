@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>用户列表</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
+    <script th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <script th:src="@{/js/bootstrap.js}"></script>
+</head>
+<body>
+<div style="width:60%;margin:0 auto;margin-top:2%;">
+    <a th:href="@{/add}">
+        <button class="btn btn-success">Add</button>
+    </a>
+    <a th:href="@{/init}">
+        <button class="btn btn-success">Init</button>
+    </a>
+    <a th:href="@{/logout}">
+        <button class="btn btn-success">Logout</button>
+    </a>
+    <table class="table table-hover" border="1">
+        <thead>
+        <tr>
+            <td>id</td>
+            <td>姓名</td>
+            <td>年龄</td>
+            <td>住址</td>
+            <td>操作</td>
+        </tr>
+        </thead>
+        <tbody th:each="person:${allPerson}">
+        <tr>
+            <td th:text="${person.id}">1</td>
+            <td th:text="${person.name}">1</td>
+            <td th:text="${person.age}">1</td>
+            <td th:text="${person.address}">1</td>
+            <td>
+                <a th:href="@{/person/}+${person.id}">
+                    <button class="btn btn-warning">修改</button>
+                </a>
+                <button class="btn btn-danger deleteBtn" th:value="@{/person/}+${person.id}">删除</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <form id="delete" method="post">
+        <input type="hidden" name="_method" value="delete"/>
+    </form>
+</div>
+<!--<h1 shiro:hasPermission="edit">有edit权限</h1>-->
+<!--<h1 shiro:hasPermission="add">有add权限</h1>-->
+<!--<h1 shiro:hasPermission="delete">有delete权限</h1>-->
+<!--<h1 shiro:hasPermission="select">有select权限</h1>-->
+<script>
+    $(".deleteBtn").click(function () {
+        $("#delete").attr("action", $(this).attr("value")).submit();
+        return false;
+    });
+</script>
+<script type="text/javascript" zindex="-1" opacity="2" count="99" th:src="@{/js/border.js}"></script>
+</body>
+</html>
