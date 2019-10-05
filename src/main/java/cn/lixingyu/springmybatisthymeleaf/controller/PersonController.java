@@ -1,6 +1,5 @@
 package cn.lixingyu.springmybatisthymeleaf.controller;
 
-import cn.lixingyu.springmybatisthymeleaf.NoAgreeRole;
 import cn.lixingyu.springmybatisthymeleaf.entity.Person;
 import cn.lixingyu.springmybatisthymeleaf.service.impl.PersonServiceImpl;
 import org.apache.shiro.authz.annotation.Logical;
