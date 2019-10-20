@@ -1,7 +1,6 @@
 package cn.lixingyu.springmybatisthymeleaf.service;
 
 import cn.lixingyu.springmybatisthymeleaf.entity.Person;
-import cn.lixingyu.springmybatisthymeleaf.entity.User;
 
 import java.util.List;
 
@@ -11,9 +10,9 @@ import java.util.List;
  */
 public interface PersonService {
 
-    Boolean addPerson(Person person);
+    void addPerson(Person person);
     List<Person> getAllPerson();
-    Boolean deletePerson(Integer id);
+    void deletePerson(Integer id);
     Person getPerson(Integer id);
-    Boolean editPerson(Person person);
+    Person editPerson(Person person);
 }

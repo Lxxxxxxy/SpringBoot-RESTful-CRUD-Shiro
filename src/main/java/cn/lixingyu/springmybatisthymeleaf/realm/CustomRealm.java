@@ -19,6 +19,7 @@ import java.util.Set;
 public class CustomRealm extends AuthorizingRealm {
 
     @Autowired
+//    @Lazy
     private UserServiceImpl userService;
 
     @Override

@@ -1,10 +1,12 @@
 package cn.lixingyu.springmybatisthymeleaf.entity;
 
+import java.io.Serializable;
+
 /**
  * @author lxxxxxxy
  * @time 2019/08/09 16:28
  */
-public class User {
+public class User implements Serializable {
     private String id;
     private String username;
     private String password;

@@ -4,6 +4,10 @@ import cn.lixingyu.springmybatisthymeleaf.dao.PersonDao;
 import cn.lixingyu.springmybatisthymeleaf.entity.Person;
 import cn.lixingyu.springmybatisthymeleaf.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,37 +23,39 @@ public class PersonServiceImpl implements PersonService {
     private PersonDao personDao;
 
     @Override
-    public Boolean addPerson(Person person) {
-        try{
-            personDao.addPerson(person);
-            return true;
-        }catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
+    @Caching(evict = {@CacheEvict(cacheNames = "allPerson", key = "1", beforeInvocation = true)})
+    public void addPerson(Person person) {
+        personDao.addPerson(person);
     }
 
     @Override
+    @Cacheable(cacheNames = "allPerson", key = "1")
     public List<Person> getAllPerson() {
+        System.out.println("查询所有Person");
         List<Person> allPerson = personDao.getAllPerson();
         return allPerson;
     }
 
     @Override
-    public Boolean deletePerson(Integer id) {
-        Boolean isDelete = personDao.deletePerson(id);
-        return isDelete;
+    //beforeInvocation：设置在方法执行之前清除缓存
+    @Caching(evict = {@CacheEvict(cacheNames = "person", key = "#id", beforeInvocation = true),
+            @CacheEvict(cacheNames = "allPerson", key = "1")})
+    public void deletePerson(Integer id) {
+        personDao.deletePerson(id);
     }
 
     @Override
+    @Cacheable(cacheNames = "person", key = "#id")
     public Person getPerson(Integer id) {
         Person person = personDao.getPerson(id);
         return person;
     }
 
     @Override
-    public Boolean editPerson(Person person) {
-        Boolean isEdit = personDao.editPerson(person);
-        return isEdit;
+    @Caching(put = {@CachePut(cacheNames = "person", key = "#person.id")},
+            evict = {@CacheEvict(cacheNames = "allPerson", key = "1", beforeInvocation = true)})
+    public Person editPerson(Person person) {
+        personDao.editPerson(person);
+        return person;
     }
 }

@@ -52,7 +52,7 @@ public class PersonController {
     @RequiresPermissions("admin:delete")
     @DeleteMapping(value = "/person/{id}")
     public String delete(@PathVariable Integer id) {
-        Boolean isDelete = personService.deletePerson(id);
+        personService.deletePerson(id);
         return "redirect:/list";
     }
 
@@ -60,14 +60,14 @@ public class PersonController {
     @PutMapping(value = "/person")
     public String editPerson(Person person){
         System.out.println(person);
-        Boolean isEdit = personService.editPerson(person);
+        personService.editPerson(person);
         return "redirect:/list";
     }
 
     @RequiresPermissions("admin:add")
     @PostMapping(value = "/person")
     public String addPerson(Person person){
-        Boolean isAdd = personService.addPerson(person);
+        personService.addPerson(person);
         return "redirect:/list";
     }
 

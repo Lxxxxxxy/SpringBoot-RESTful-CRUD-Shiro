@@ -4,6 +4,7 @@ import cn.lixingyu.springmybatisthymeleaf.entity.Person;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 public interface PersonDao {
 
     @Insert("insert into person values(null,#{name},#{age},#{address})")
-    Boolean addPerson(Person person);
+    void addPerson(Person person);
 
     @Select("select * from person")
     List<Person> getAllPerson();
@@ -27,7 +28,7 @@ public interface PersonDao {
     @Select("select * from person where id = #{id}")
     Person getPerson(Integer id);
 
-    @Insert("update person set name = #{name},age = #{age},address = #{address} where id = #{id}")
-    Boolean editPerson(Person person);
+    @Update("update person set name = #{name},age = #{age},address = #{address} where id = #{id}")
+    void editPerson(Person person);
 
 }
