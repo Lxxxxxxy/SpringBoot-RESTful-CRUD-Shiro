@@ -20,4 +20,6 @@ public interface UserService {
     void insertRole(String username,String role);
 
     void insertPermissions(String username,String role);
+
+    void changeUserStatus(String id);
 }

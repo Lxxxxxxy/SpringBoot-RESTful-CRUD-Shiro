@@ -1,6 +1,7 @@
 package cn.lixingyu.springmybatisthymeleaf.controller;
 
 import cn.lixingyu.springmybatisthymeleaf.entity.User;
+import cn.lixingyu.springmybatisthymeleaf.exception.UnActiveException;
 import cn.lixingyu.springmybatisthymeleaf.realm.CustomRealm;
 import cn.lixingyu.springmybatisthymeleaf.service.impl.UserServiceImpl;
 import org.apache.commons.logging.Log;
@@ -15,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -41,16 +39,17 @@ public class UserController {
 
     @PostMapping(value = "/register")
     @ResponseBody
-    public String register(User user, @RequestParam String role){
-        if(user==null){
+    public String register(User user, @RequestParam String role) {
+        if (user == null) {
             return "<script>alert('注册失败！');window.location='/register'</script>";
         }
 //        System.out.println(role);
         user.setId(UUID.randomUUID().toString());
-        userService.insertPermissions(user.getUsername(),role);
+        userService.insertPermissions(user.getUsername(), role);
 //        System.out.println(user.toString());
         String md5 = new SimpleHash("md5", user.getPassword(), user.getUsername(), 5).toHex();
         user.setPassword(md5);
+        user.setStatus(0);
         try {
             userService.register(user);
             return "<script>alert('注册成功！');window.location='/login'</script>";
@@ -61,7 +60,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/login")
-    public String login(User user, Model model){
+    public String login(User user, Model model) {
 //        defaultSecurityManager.setRealm(customRealm);
 //        SecurityUtils.setSecurityManager(defaultSecurityManager);
 //        if(user == null){
@@ -72,22 +71,35 @@ public class UserController {
         try {
             token.setRememberMe(true);
             subject.login(token);
-            logger.info(user.getUsername()+"    登录");
+            logger.info(user.getUsername() + "    登录");
             return "redirect:/list";
+        } catch (UnActiveException e) {
+            model.addAttribute("loginError", e.getMessage());
         } catch (AuthenticationException e) {
             e.printStackTrace();
+            model.addAttribute("loginError", e.getMessage());
         }
-        model.addAttribute("loginError","登录失败");
         return "login";
     }
 
     @GetMapping(value = "/logout")
-    public String logout(){
+    public String logout() {
         Subject subject = SecurityUtils.getSubject();
         String username = (String) subject.getPrincipal();
         subject.logout();
-        logger.info(username+"    登出");
+        logger.info(username + "    登出");
         return "redirect:/login";
+    }
+
+    @GetMapping(value = "/changeUserStatus")
+    @ResponseBody
+    public String changeUserStatus(@RequestParam String id){
+        try {
+            userService.changeUserStatus(id);
+            return "<script>alert('激活成功！');window.location='/login'</script>";
+        } catch (Exception e) {
+        }
+        return "<script>alert('激活失败！');window.location='/login'</script>";
     }
 
 }

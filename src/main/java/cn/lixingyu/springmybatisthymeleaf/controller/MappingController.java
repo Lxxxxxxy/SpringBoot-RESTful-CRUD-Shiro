@@ -38,4 +38,5 @@ public class MappingController {
     public String registerPage(){
         return "register";
     }
+
 }

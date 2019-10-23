@@ -1,6 +1,7 @@
 package cn.lixingyu.springmybatisthymeleaf.realm;
 
 import cn.lixingyu.springmybatisthymeleaf.entity.User;
+import cn.lixingyu.springmybatisthymeleaf.exception.UnActiveException;
 import cn.lixingyu.springmybatisthymeleaf.service.impl.UserServiceImpl;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -39,6 +40,9 @@ public class CustomRealm extends AuthorizingRealm {
         User user = userService.login(username);
         if(user == null){
             throw new UnknownAccountException("用户不存在！");
+        }
+        if(user.getStatus() == 0){
+            throw new UnActiveException("用户未激活！");
         }
         SimpleAuthenticationInfo custom = new SimpleAuthenticationInfo(user.getUsername(), user.getPassword(), "custom");
         //设置用户加密的盐值，这里使用的是用户名

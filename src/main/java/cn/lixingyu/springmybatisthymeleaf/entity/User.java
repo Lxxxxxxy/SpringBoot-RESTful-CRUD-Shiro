@@ -10,6 +10,8 @@ public class User implements Serializable {
     private String id;
     private String username;
     private String password;
+    private String mailAddress;
+    private Integer status;
 
     @Override
     public String toString() {
@@ -17,6 +19,8 @@ public class User implements Serializable {
                 "id='" + id + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", mailAddress='" + mailAddress + '\'' +
+                ", status=" + status +
                 '}';
     }
 
@@ -44,10 +48,28 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public User(String id, String username, String password) {
+    public String getMailAddress() {
+        return mailAddress;
+    }
+
+    public void setMailAddress(String mailAddress) {
+        this.mailAddress = mailAddress;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public User(String id, String username, String password, String mailAddress, Integer status) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.mailAddress = mailAddress;
+        this.status = status;
     }
 
     public User() {
