@@ -1,11 +1,8 @@
-package cn.lixingyu.springmybatisthymeleaf.dao;
+package cn.lixingyu.springmybatisthymeleaf.repository;
 
 import cn.lixingyu.springmybatisthymeleaf.entity.Person;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
-import org.springframework.stereotype.Component;
+import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -13,8 +10,9 @@ import java.util.List;
  * @author lxxxxxxy
  * @time 2019/07/31 17:35
  */
-@Component
-public interface PersonDao {
+@Repository
+@Mapper
+public interface PersonRepository {
 
     @Insert("insert into person values(null,#{name},#{age},#{address})")
     void addPerson(Person person);

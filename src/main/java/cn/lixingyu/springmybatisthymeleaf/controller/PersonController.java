@@ -2,14 +2,19 @@ package cn.lixingyu.springmybatisthymeleaf.controller;
 
 import cn.lixingyu.springmybatisthymeleaf.entity.Person;
 import cn.lixingyu.springmybatisthymeleaf.service.impl.PersonServiceImpl;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,6 +27,9 @@ public class PersonController {
 
     @Autowired
     private PersonServiceImpl personService;
+
+    @Autowired
+    private RedisTemplate myRedisTemplate;
 
     @GetMapping(value = "/{path}")
     public String mapping(@PathVariable String path){
@@ -44,8 +52,24 @@ public class PersonController {
 //    @RequiresPermissions(value = {"admin:select","user:select"},logical= Logical.OR)
     @GetMapping(value = "/list")
     public String list(Model model) {
+        //获取当前登录用户的信息
+        Subject subject = SecurityUtils.getSubject();
+        String username = (String) subject.getPrincipal();
+        //登陆成功，向Redis存储以用户名为key，系统毫秒数为value的键值对
+        myRedisTemplate.opsForList().leftPush(username, System.currentTimeMillis());
+        //取出最后一次登录时间
+        List loginLastTime = myRedisTemplate.opsForList().range(username, 0, -1);
+        if(loginLastTime.size()<=1){
+            model.addAttribute("loginLastTime",
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(loginLastTime.get(0)+""))));
+        }else{
+            model.addAttribute("loginLastTime",
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(loginLastTime.get(1)+""))));
+        }
+        //获取用户列表
         List<Person> allPerson = personService.getAllPerson();
         model.addAttribute("allPerson", allPerson);
+        model.addAttribute("loginError", "用户名或密码错误！");
         return "list";
     }
 

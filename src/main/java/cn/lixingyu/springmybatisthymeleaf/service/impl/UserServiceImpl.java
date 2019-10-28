@@ -1,8 +1,8 @@
 package cn.lixingyu.springmybatisthymeleaf.service.impl;
 
-import cn.lixingyu.springmybatisthymeleaf.dao.UserDao;
 import cn.lixingyu.springmybatisthymeleaf.entity.User;
 import cn.lixingyu.springmybatisthymeleaf.exception.ChangeStatusException;
+import cn.lixingyu.springmybatisthymeleaf.repository.UserRepository;
 import cn.lixingyu.springmybatisthymeleaf.service.UserService;
 import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -30,36 +30,36 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(String username) {
-        return userDao.login(username);
+        return userRepository.login(username);
     }
 
     @Override
     public void register(User user) {
-        userDao.register(user);
+        userRepository.register(user);
         rabbitTemplate.convertAndSend("springmybatisthymeleaf.direct","mail",user);
     }
 
     @Override
     public Set<String> getPermissions(String username) {
-        return userDao.getPermissions(username);
+        return userRepository.getPermissions(username);
     }
 
     @Override
     public Set<String> getRoles(String username) {
-        return userDao.getRoles(username);
+        return userRepository.getRoles(username);
     }
 
     @Override
     public void insertRole(String username, String role) {
-        userDao.insertRole(username,role);
+        userRepository.insertRole(username,role);
     }
 
     @Override
     public void insertPermissions(String username, String role) {
         if(role.equals("admin")){
-            userDao.insertPermissions(username,"admin:*");
+            userRepository.insertPermissions(username,"admin:*");
         }else{
-            userDao.insertPermissions(username,"user:*");
+            userRepository.insertPermissions(username,"user:*");
         }
     }
 
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
             throw new ChangeStatusException("激活用户失败！");
         }
         try{
-            userDao.changeUserStatus(id);
+            userRepository.changeUserStatus(id);
             logger.info("激活"+id+"成功！");
         }catch (Exception e){
             throw new ChangeStatusException("激活用户失败！");

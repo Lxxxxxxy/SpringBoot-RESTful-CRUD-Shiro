@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
-@MapperScan("cn.lixingyu.springmybatisthymeleaf.dao")
+@MapperScan("cn.lixingyu.springmybatisthymeleaf.repository")
 @EnableCaching
 @EnableRabbit
 public class SpringmybatisthymeleafApplication {

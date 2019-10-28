@@ -26,6 +26,10 @@ public class RabbitServiceImpl implements RabbitService {
     @RabbitListener(queues = "springmybatisthymeleafQueue")
     public void sendMail(User user) {
         logger.info("开始给用户"+user.getUsername()+"发送邮件");
-        mailConfig.sendSimpleMail(user.getMailAddress(),"lixingyu.cn激活邮件","<a href=\"https://www.lixingyu.cn:8081/changeUserStatus?id="+user.getId()+"\">点我激活</a>",logger);
+        try{
+            mailConfig.sendSimpleMail(user.getMailAddress(),"lixingyu.cn激活邮件","<a href=\"https://www.lixingyu.cn:8081/changeUserStatus?id="+user.getId()+"\">点我激活</a>",logger);
+        }catch (Exception e){
+            logger.error("发送邮件时发生异常！", e);
+        }
     }
 }

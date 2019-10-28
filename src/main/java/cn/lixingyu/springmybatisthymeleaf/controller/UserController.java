@@ -1,6 +1,8 @@
 package cn.lixingyu.springmybatisthymeleaf.controller;
 
 import cn.lixingyu.springmybatisthymeleaf.entity.User;
+import cn.lixingyu.springmybatisthymeleaf.exception.ChangeStatusException;
+import cn.lixingyu.springmybatisthymeleaf.exception.LoginCountException;
 import cn.lixingyu.springmybatisthymeleaf.exception.UnActiveException;
 import cn.lixingyu.springmybatisthymeleaf.realm.CustomRealm;
 import cn.lixingyu.springmybatisthymeleaf.service.impl.UserServiceImpl;
@@ -16,7 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.UUID;
 
@@ -75,9 +80,15 @@ public class UserController {
             return "redirect:/list";
         } catch (UnActiveException e) {
             model.addAttribute("loginError", e.getMessage());
-        } catch (AuthenticationException e) {
+        } catch (ChangeStatusException e) {
             e.printStackTrace();
             model.addAttribute("loginError", e.getMessage());
+        } catch (LoginCountException e) {
+            e.printStackTrace();
+            model.addAttribute("loginError", e.getMessage());
+        } catch (AuthenticationException e) {
+            e.printStackTrace();
+            model.addAttribute("loginError", "用户名或密码错误！");
         }
         return "login";
     }

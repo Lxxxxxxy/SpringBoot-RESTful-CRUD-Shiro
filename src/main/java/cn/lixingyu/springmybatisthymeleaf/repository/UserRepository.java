@@ -1,10 +1,10 @@
-package cn.lixingyu.springmybatisthymeleaf.dao;
+package cn.lixingyu.springmybatisthymeleaf.repository;
 
 import cn.lixingyu.springmybatisthymeleaf.entity.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
@@ -12,8 +12,8 @@ import java.util.Set;
  * @author lxxxxxxy
  * @time 2019/08/09 16:39
  */
-@Component
-public interface UserDao {
+@Repository
+public interface UserRepository {
     @Select("select * from user where username=#{username}")
     User login(String username);
 

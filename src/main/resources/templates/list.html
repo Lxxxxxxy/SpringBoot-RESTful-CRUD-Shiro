@@ -19,6 +19,8 @@
     <a th:href="@{/logout}">
         <button class="btn btn-success">Logout</button>
     </a>
+    <span th:text="'上次登录时间：'+${loginLastTime}">
+    </span>
     <table class="table table-hover" border="1">
         <thead>
         <tr>
@@ -59,5 +61,38 @@
     });
 </script>
 <script type="text/javascript" zindex="-1" opacity="2" count="99" th:src="@{/js/border.js}"></script>
+<script>
+    $(function () {
+
+        var editUrl = '/getLoginLastTime?username=' + para;
+        $.ajax({
+            url: editUrl,
+            type: 'POST',
+            contentType: false,
+            processData: false,
+            cache: false,
+            success: function (data) {
+                if (data.success) {
+                    // alert(data.productInfo);
+                    // alert(data.userAddressInfo);
+                    // alert(data.buyCount);
+                    // alert(data.shopInfo);
+                    var product = JSON.parse(data.productInfo);
+                    var bigCategory = $('.bigCategory');
+                    $(document).ready(function () {
+                        $('#productImage').attr("src", product.productImage);
+                        $('#productName').text(product.productName);
+                        $('#productDesc').text(product.productDesc);
+                        $('#productNowprice').text(product.productNowprice);
+                        $('#productRemaining').text(product.productRemaining);
+                        $('#countPrice').text(product.productNowprice * data.buyCount);
+                    });
+                } else {
+                    alert(data.buyInfo);
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
