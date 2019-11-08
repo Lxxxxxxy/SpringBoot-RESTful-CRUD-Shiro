@@ -27,9 +27,18 @@ public class Config {
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
         GenericJackson2JsonRedisSerializer json = new GenericJackson2JsonRedisSerializer();
-        redisTemplate.setDefaultSerializer(json);
+        redisTemplate.setValueSerializer(json);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        return redisTemplate;
+    }
+
+    //防止出现Could not read JSON: Unrecognized field "valid" (class org.apache.shiro.session.mgt.SimpleSession), not marked as ignorable
+    @Bean("myRedisSessionTemplate")
+    public RedisTemplate<Object, Object> redisSessionTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
         return redisTemplate;
     }
 

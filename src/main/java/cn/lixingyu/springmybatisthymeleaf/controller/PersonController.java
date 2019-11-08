@@ -8,14 +8,17 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import redis.clients.jedis.Tuple;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author lxxxxxxy
@@ -39,9 +42,9 @@ public class PersonController {
     @RequiresPermissions(value = {"admin:add","user:add"},logical= Logical.OR)
     @GetMapping(value = "/init")
     public String init() {
-        Person p1 = new Person("lxy", 20, "重庆");
-        Person p2 = new Person("xlr", 19, "重庆");
-        Person p3 = new Person("yyy", 21, "重庆");
+        Person p1 = new Person("lxy", 20,"重庆");
+        Person p2 = new Person("xlr", 19,"重庆");
+        Person p3 = new Person("yyy", 21,"重庆");
         personService.addPerson(p1);
         personService.addPerson(p2);
         personService.addPerson(p3);
@@ -55,10 +58,12 @@ public class PersonController {
         //获取当前登录用户的信息
         Subject subject = SecurityUtils.getSubject();
         String username = (String) subject.getPrincipal();
-        //登陆成功，向Redis存储以用户名为key，系统毫秒数为value的键值对
-        myRedisTemplate.opsForList().leftPush(username, System.currentTimeMillis());
         //取出最后一次登录时间
         List loginLastTime = myRedisTemplate.opsForList().range(username, 0, -1);
+        //取出登录次数
+        Integer loginCount = (Integer) myRedisTemplate.opsForValue().get(username + ":Login");
+        //获取点赞排行剩余时间
+        Long likeLastTime = myRedisTemplate.getExpire("personZset");
         if(loginLastTime.size()<=1){
             model.addAttribute("loginLastTime",
                     new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(loginLastTime.get(0)+""))));
@@ -67,8 +72,12 @@ public class PersonController {
                     new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(Long.parseLong(loginLastTime.get(1)+""))));
         }
         //获取用户列表
-        List<Person> allPerson = personService.getAllPerson();
+        Set<ZSetOperations.TypedTuple<Tuple>> allPerson = personService.getAllPerson();
         model.addAttribute("allPerson", allPerson);
+        //登录次数
+        model.addAttribute("loginCount", loginCount);
+        //最后一次登录时间
+        model.addAttribute("likeLastTime", likeLastTime);
         model.addAttribute("loginError", "用户名或密码错误！");
         return "list";
     }
@@ -101,6 +110,12 @@ public class PersonController {
         Person person = personService.getPerson(id);
         model.addAttribute("person",person);
         return "edit";
+    }
+
+    @PostMapping(value = "/person/like")
+    @ResponseBody
+    public String like(@RequestParam String id){
+        return personService.like(Integer.parseInt(id));
     }
 
 }

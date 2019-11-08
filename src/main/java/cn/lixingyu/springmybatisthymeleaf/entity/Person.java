@@ -6,11 +6,18 @@ import java.io.Serializable;
  * @author lxxxxxxy
  * @time 2019/07/31 17:30
  */
-public class Person implements Serializable {
+public class Person implements Serializable, Comparable<Person> {
     private Integer id;
     private String name;
     private Integer age;
+    private Long likes;
     private String address;
+
+    public Person(String name, Integer age, String address) {
+        this.name = name;
+        this.age = age;
+        this.address = address;
+    }
 
     @Override
     public String toString() {
@@ -18,14 +25,9 @@ public class Person implements Serializable {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", age=" + age +
+                ", likes=" + likes +
                 ", address='" + address + '\'' +
                 '}';
-    }
-
-    public Person(String name, Integer age, String address) {
-        this.name = name;
-        this.age = age;
-        this.address = address;
     }
 
     public Integer getId() {
@@ -52,6 +54,14 @@ public class Person implements Serializable {
         this.age = age;
     }
 
+    public Long getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Long likes) {
+        this.likes = likes;
+    }
+
     public String getAddress() {
         return address;
     }
@@ -60,13 +70,26 @@ public class Person implements Serializable {
         this.address = address;
     }
 
-    public Person(Integer id, String name, Integer age, String address) {
-        this.id = id;
+    public Person() {
+    }
+
+    public Person(String name, Integer age, Long likes, String address) {
         this.name = name;
         this.age = age;
+        this.likes = likes;
         this.address = address;
     }
 
-    public Person() {
+    public Person(Integer id, String name, Integer age, Long likes, String address) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.likes = likes;
+        this.address = address;
+    }
+
+    @Override
+    public int compareTo(Person o) {
+        return -1;
     }
 }

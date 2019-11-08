@@ -19,7 +19,12 @@
     <a th:href="@{/logout}">
         <button class="btn btn-success">Logout</button>
     </a>
+    <a th:href="@{http://www.lixingyu.cn:8083}">
+        <button class="btn btn-success">单点登录另一个项目</button>
+    </a>
     <span th:text="'上次登录时间：'+${loginLastTime}">
+    </span>
+    <span th:text="'登录次数：'+${loginCount}">
     </span>
     <table class="table table-hover" border="1">
         <thead>
@@ -28,20 +33,25 @@
             <td>姓名</td>
             <td>年龄</td>
             <td>住址</td>
+            <td>点赞量</td>
             <td>操作</td>
         </tr>
         </thead>
         <tbody th:each="person:${allPerson}">
         <tr>
-            <td th:text="${person.id}">1</td>
-            <td th:text="${person.name}">1</td>
-            <td th:text="${person.age}">1</td>
-            <td th:text="${person.address}">1</td>
+            <td th:text="${person.value.id}">1</td>
+            <td th:text="${person.value.name}">1</td>
+            <td th:text="${person.value.age}">1</td>
+            <td th:text="${person.value.address}">1</td>
+            <td th:text="${person.score}">1</td>
             <td>
-                <a th:href="@{/person/}+${person.id}">
+                <a th:href="@{/person/}+${person.value.id}">
                     <button class="btn btn-warning">修改</button>
                 </a>
-                <button class="btn btn-danger deleteBtn" th:value="@{/person/}+${person.id}">删除</button>
+                <button class="btn btn-danger deleteBtn" th:value="@{/person/}+${person.value.id}">删除</button>
+                <button class="btn btn-danger likeBtn"
+                        th:onclick="'likeBtn(\''+@{/person/like?id=}+${person.value.id}+'\')'">点赞
+                </button>
             </td>
         </tr>
         </tbody>
@@ -62,37 +72,25 @@
 </script>
 <script type="text/javascript" zindex="-1" opacity="2" count="99" th:src="@{/js/border.js}"></script>
 <script>
-    $(function () {
-
-        var editUrl = '/getLoginLastTime?username=' + para;
-        $.ajax({
-            url: editUrl,
-            type: 'POST',
-            contentType: false,
-            processData: false,
-            cache: false,
-            success: function (data) {
-                if (data.success) {
-                    // alert(data.productInfo);
-                    // alert(data.userAddressInfo);
-                    // alert(data.buyCount);
-                    // alert(data.shopInfo);
-                    var product = JSON.parse(data.productInfo);
-                    var bigCategory = $('.bigCategory');
-                    $(document).ready(function () {
-                        $('#productImage').attr("src", product.productImage);
-                        $('#productName').text(product.productName);
-                        $('#productDesc').text(product.productDesc);
-                        $('#productNowprice').text(product.productNowprice);
-                        $('#productRemaining').text(product.productRemaining);
-                        $('#countPrice').text(product.productNowprice * data.buyCount);
-                    });
-                } else {
-                    alert(data.buyInfo);
+    function likeBtn(path) {
+        $(function () {
+            $.ajax({
+                url: path,
+                type: 'POST',
+                contentType: false,
+                processData: false,
+                cache: false,
+                success: function (data) {
+                    if (data == "success") {
+                        alert("点赞成功");
+                        window.location.reload();
+                    } else {
+                        alert("点赞失败");
+                    }
                 }
-            }
+            });
         });
-    });
+    }
 </script>
 </body>
 </html>

@@ -17,7 +17,7 @@ public interface UserRepository {
     @Select("select * from user where username=#{username}")
     User login(String username);
 
-    @Insert("insert into user values(#{id},#{username},#{password},#{mailAddress},#{status})")
+    @Insert("insert into user values(#{id},#{username},#{password},#{email},#{status})")
     void register(User user);
 
     @Select("select permission from permissions where username=#{username}")

@@ -4,9 +4,12 @@ import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import cn.lixingyu.springmybatisthymeleaf.realm.CustomRealm;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,8 +39,8 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/css/**", "anon");
         filterChainDefinitionMap.put("/js/**", "anon");
         filterChainDefinitionMap.put("/login", "anon");
+        filterChainDefinitionMap.put("/active", "anon");
         filterChainDefinitionMap.put("/register", "anon");
-        filterChainDefinitionMap.put("/changeUserStatus", "anon");
         filterChainDefinitionMap.put("/", "anon");
         //主要这行代码必须放在所有权限设置的最后，不然会导致所有 url 都被拦截 剩余的都需要认证
         filterChainDefinitionMap.put("/**", "authc");
@@ -48,9 +51,10 @@ public class ShiroConfig {
 
     //设置SecurityManager
     @Bean
-    public SecurityManager securityManager() {
+    public SecurityManager securityManager(SessionManager sessionManager,SimpleCookie simpleCookie, RedisShiroSessionDao redisShiroSessionDao) {
         DefaultWebSecurityManager defaultSecurityManager = new DefaultWebSecurityManager();
         defaultSecurityManager.setRealm(customRealm(hashedCredentialsMatcher()));
+        defaultSecurityManager.setSessionManager(sessionManager(simpleCookie,redisShiroSessionDao));
         return defaultSecurityManager;
     }
 
@@ -59,6 +63,7 @@ public class ShiroConfig {
     public CustomRealm customRealm(HashedCredentialsMatcher hashedCredentialsMatcher) {
         CustomRealm customRealm = new CustomRealm();
         customRealm.setCredentialsMatcher(hashedCredentialsMatcher);
+        customRealm.setAuthenticationCachingEnabled(false);
         return customRealm;
     }
 
@@ -111,5 +116,25 @@ public class ShiroConfig {
         return hashedCredentialsMatcher;
     }
 
-    //配置错误代码页面
+    //设置Cookie
+    @Bean("shiroCookie")
+    public SimpleCookie simpleCookie(){
+        SimpleCookie simpleCookie = new SimpleCookie();
+        simpleCookie.setName("shiroCookie");
+//        simpleCookie.setPath("/");
+        //防止xss读取cookie
+        simpleCookie.setHttpOnly(true);
+        //关闭浏览器后失效
+        simpleCookie.setMaxAge(-1);
+        return simpleCookie;
+    }
+
+    //自定义sessionManager
+    @Bean
+    public SessionManager sessionManager(SimpleCookie simpleCookie, RedisShiroSessionDao redisShiroSessionDao){
+        DefaultWebSessionManager defaultWebSessionManager = new DefaultWebSessionManager();
+        defaultWebSessionManager.setSessionIdCookie(simpleCookie);
+        defaultWebSessionManager.setSessionDAO(redisShiroSessionDao);
+        return defaultWebSessionManager;
+    }
 }

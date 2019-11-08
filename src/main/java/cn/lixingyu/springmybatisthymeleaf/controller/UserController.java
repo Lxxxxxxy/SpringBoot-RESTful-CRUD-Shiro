@@ -16,6 +16,7 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 /**
@@ -37,6 +39,9 @@ public class UserController {
 
     @Autowired
     private CustomRealm customRealm;
+
+    @Autowired
+    private RedisTemplate myRedisTemplate;
 
     private DefaultSecurityManager defaultSecurityManager = new DefaultSecurityManager();
 
@@ -65,7 +70,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/login")
-    public String login(User user, Model model) {
+    public String login(User user, Model model, HttpServletRequest request) {
 //        defaultSecurityManager.setRealm(customRealm);
 //        SecurityUtils.setSecurityManager(defaultSecurityManager);
 //        if(user == null){
@@ -77,6 +82,10 @@ public class UserController {
             token.setRememberMe(true);
             subject.login(token);
             logger.info(user.getUsername() + "    登录");
+            //登录次数+1
+            myRedisTemplate.opsForValue().increment(user.getUsername()+":Login");
+            //登陆成功，向Redis存储以用户名为key，系统毫秒数为value的键值对
+            myRedisTemplate.opsForList().leftPush(user.getUsername(), System.currentTimeMillis());
             return "redirect:/list";
         } catch (UnActiveException e) {
             model.addAttribute("loginError", e.getMessage());

@@ -14,6 +14,9 @@ import java.util.List;
 @Mapper
 public interface PersonRepository {
 
+//    @Insert("insert into person values(null,#{name},#{age},#{address})")
+//    void addPerson(Person person);
+
     @Insert("insert into person values(null,#{name},#{age},#{address})")
     void addPerson(Person person);
 
@@ -28,5 +31,4 @@ public interface PersonRepository {
 
     @Update("update person set name = #{name},age = #{age},address = #{address} where id = #{id}")
     void editPerson(Person person);
-
 }
